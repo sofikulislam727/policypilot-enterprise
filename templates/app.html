@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light" />
+  <title>{{ app_name }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Source+Serif+4:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <div class="shell">
+
+    <!-- Left: what this assistant is and how it works -->
+    <aside class="sidebar" aria-label="About this assistant">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+        </div>
+        <h1>PolicyPilot</h1>
+        <p>HR policy assistant. Answers come from your company's HR documents first. The public web is used only when those aren't enough.</p>
+      </div>
+
+      <section class="how" aria-labelledby="howTitle">
+        <h2 id="howTitle">How an answer is found</h2>
+        <ol class="steps">
+          <li>Understand the question</li>
+          <li>Search HR documents</li>
+          <li>Check the evidence</li>
+          <li>Search the web if needed</li>
+          <li>Rewrite the query and retry</li>
+          <li>Write a sourced answer</li>
+        </ol>
+      </section>
+
+      <div class="sidebar-foot">
+        <button id="openUpload" class="btn btn-secondary btn-block" type="button" data-open-upload>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="M9 15h6"/></svg>
+          Add HR document
+        </button>
+      </div>
+    </aside>
+
+    <!-- Center: conversation -->
+    <main class="main">
+      <header class="topbar">
+        <h2>Conversation</h2>
+        <div class="topbar-actions">
+          <span class="chip">Agentic RAG</span>
+          <button type="button" class="btn btn-secondary btn-sm only-mobile" data-open-upload>Add document</button>
+          <button type="button" class="btn btn-secondary btn-sm only-compact" id="openTrace">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Agent trace
+          </button>
+        </div>
+      </header>
+
+      <section id="chat" class="chat-area" role="log" aria-live="polite" aria-label="Conversation">
+        <div id="welcome" class="welcome">
+          <h2>What can I help you find?</h2>
+          <p>Ask about leave, benefits, remote work, expenses, or any other HR policy. Every answer shows where it came from.</p>
+          <div class="examples">
+            <button type="button" class="example">How many annual leave days do employees receive?</button>
+            <button type="button" class="example">What is our remote work policy?</button>
+            <button type="button" class="example">What are the latest public holiday rules in India?</button>
+          </div>
+          <p class="welcome-hint">If the company documents can't answer a question, the assistant searches the public web and labels the answer as external.</p>
+        </div>
+      </section>
+
+      <section class="composer-wrap">
+        <form id="chatForm" class="composer">
+          <label class="sr-only" for="question">Your question</label>
+          <textarea id="question" rows="1" placeholder="Ask an HR policy question" required></textarea>
+          <button type="submit" id="sendBtn" class="btn btn-primary send-btn">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
+            Send
+          </button>
+        </form>
+        <p class="composer-note">Enter sends, Shift+Enter adds a line. Answers from the public web are not company policy.</p>
+      </section>
+    </main>
+
+    <!-- Right: agent trace -->
+    <aside class="trace-panel" id="tracePanel" aria-label="Agent trace">
+      <div class="trace-head">
+        <div>
+          <h2>Agent trace</h2>
+          <p class="muted">The steps taken for your latest question.</p>
+        </div>
+        <button type="button" id="closeTrace" class="icon-btn only-compact" aria-label="Close agent trace">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <ol id="trace" class="trace-list">
+        <li class="trace-empty">Ask a question to see the steps here.</li>
+      </ol>
+
+      <div class="source-box" id="sourceBox" data-tone="none">
+        <i class="dot" aria-hidden="true"></i>
+        <div>
+          <span class="source-label">Answer source</span>
+          <strong id="sourceUsed">—</strong>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="scrim" id="scrim"></div>
+
+  <!-- Upload dialog -->
+  <div id="uploadModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="uploadTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="uploadTitle">Add an HR document</h2>
+        <button id="closeUpload" class="icon-btn" type="button" aria-label="Close">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <p class="muted">Upload a PDF, TXT, Markdown, or DOCX file. It's split into sections and indexed so the assistant can search it.</p>
+
+      <div class="field">
+        <label for="adminKey">Admin API key</label>
+        <input id="adminKey" type="password" autocomplete="off" placeholder="Enter the admin key" />
+      </div>
+      <div class="field">
+        <label for="fileInput">Document</label>
+        <input id="fileInput" type="file" accept=".pdf,.txt,.md,.docx" />
+      </div>
+
+      <button id="uploadBtn" class="btn btn-primary btn-block" type="button">Index document</button>
+      <div id="uploadStatus" class="upload-status" role="status"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

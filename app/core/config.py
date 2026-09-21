@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     pinecone_index_name: str = "policypilot"
     pinecone_namespace: str = "company-hr-kb"
     embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
-    openai_model: str = "openai/gpt-oss-120b"
+    groq_model: str = "openai/gpt-oss-120b"
     top_k: int = 4
     max_retries: int = 1
     admin_api_key: str = "change-me-in-production"
